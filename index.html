@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Döviz Hesaplayıcı</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="kart">
+    <h2>Canlı Döviz Çevirici Panel</h2>
+    
+    <!-- Çevrilecek Miktar -->
+    <input id="dolarMiktari" type="number" placeholder="Miktarı girin...">
+    
+    <!-- Para Birimi Seçimi -->
+    <select id="paraBirimi">
+        <option value="USD">Dolar (USD) -> TL</option>
+        <option value="EUR">Euro (EUR) -> TL</option>
+        <option value="GBP">Sterlin (GBP) -> TL</option>
+    </select>
+    
+    <button id="btnHesapla">Hesapla</button>
+    
+    <!-- Sonucu göstereceğimiz alan -->
+    <div id="sonucAlani"></div>
+</div>
+    <script src="odev.js"></script>  
+</body> 
+</html>
