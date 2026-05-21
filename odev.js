@@ -8,7 +8,7 @@ const sonucKutusu = document.getElementById("sonucAlani");
 hesaplaButonu.addEventListener("click", async function() {
     
     let girilenMiktar = girisKutusu.value; 
-    let secilenIslem = paraBirimiSecimi.value; // Örn: "TRY_TO_USD" veya "USD_TO_TRY"
+    let secilenIslem = paraBirimiSecimi.value; 
 
     if (girilenMiktar !== "" && girilenMiktar > 0) {
         
@@ -16,7 +16,7 @@ hesaplaButonu.addEventListener("click", async function() {
             sonucKutusu.innerText = "Güncel kur verileri çekiliyor...";
             sonucKutusu.style.color = "#ffc107"; 
 
-            // API'den döviz verilerini çekiyoruz (Base: USD)
+            // HTTPS olmasına ve doğrudan fonksiyonun İÇİNDE çağrılmasına dikkat ediyoruz
             let response = await fetch("https://api.exchangerate-api.com/v4/latest/USD");
             let data = await response.json();
 
@@ -24,13 +24,13 @@ hesaplaButonu.addEventListener("click", async function() {
             let usdToEur = data.rates.EUR; // 1 Dolar kaç Euro?
             let usdToGbp = data.rates.GBP; // 1 Dolar kaç Sterlin?
 
-            let guncelKur = 0;
-            let hesaplananSonuc = 0;
+            // Başlangıç değerlerini sıfır yapmıyoruz, doğrudan if-else içinde tanımlayacağız
+            let guncelKur;
+            let hesaplananSonuc;
             let hedefBirim = "";
             let kaynakBirim = "";
 
-            // --- HESAPLAMA MANTIĞI ---
-            
+            // --- DÖVİZDEN TL'YE ÇEVİRME ---
             if (secilenIslem === "USD_TO_TRY") {
                 guncelKur = usdToTry;
                 hesaplananSonuc = Number(girilenMiktar) * guncelKur;
@@ -46,24 +46,24 @@ hesaplaButonu.addEventListener("click", async function() {
                 hesaplananSonuc = Number(girilenMiktar) * guncelKur;
                 kaynakBirim = "GBP"; hedefBirim = "TL";
             } 
-            // --- TL'DEN DÖVİZE ÇEVİRME (YENİ EKLENEN KISIM) ---
+            // --- TL'DEN DÖVİZE ÇEVİRME ---
             else if (secilenIslem === "TRY_TO_USD") {
                 guncelKur = usdToTry; 
-                hesaplananSonuc = Number(girilenMiktar) / guncelKur; // Çarpmak yerine böldük
+                hesaplananSonuc = Number(girilenMiktar) / guncelKur; 
                 kaynakBirim = "TL"; hedefBirim = "USD";
             } 
             else if (secilenIslem === "TRY_TO_EUR") {
-                guncelKur = usdToTry / usdToEur; // Euro/TL kuru
-                hesaplananSonuc = Number(girilenMiktar) / guncelKur; // TL'yi kura bölüyoruz
+                guncelKur = usdToTry / usdToEur; 
+                hesaplananSonuc = Number(girilenMiktar) / guncelKur; 
                 kaynakBirim = "TL"; hedefBirim = "EUR";
             } 
             else if (secilenIslem === "TRY_TO_GBP") {
-                guncelKur = usdToTry / usdToGbp; // Sterlin/TL kuru
+                guncelKur = usdToTry / usdToGbp; 
                 hesaplananSonuc = Number(girilenMiktar) / guncelKur;
                 kaynakBirim = "TL"; hedefBirim = "GBP";
             }
 
-            // Sonucu ekrana yazdırıyoruz
+            // Sonucu ekrana yazdırıyoruz (Daha temiz bir görünüm için birimleri güncelledik)
             sonucKutusu.innerText = `${girilenMiktar} ${kaynakBirim} = ${hesaplananSonuc.toFixed(2)} ${hedefBirim} ediyor. (Kur: ${guncelKur.toFixed(4)})`;
             sonucKutusu.style.color = "#28a745"; 
             
@@ -71,7 +71,8 @@ hesaplaButonu.addEventListener("click", async function() {
             girisKutusu.value = ""; 
 
         } catch (hata) {
-            sonucKutusu.innerText = "Kur verisi alınamadı, lütfen internetinizi kontrol edin.";
+            // Eğer API'ye erişilemezse hatayı buraya basacak
+            sonucKutusu.innerText = "Kur verisi alınamadı! Hata: " + hata.message;
             sonucKutusu.style.color = "#dc3545";
         }
 
