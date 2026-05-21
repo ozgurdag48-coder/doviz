@@ -1,4 +1,4 @@
-// 1. Elementleri seçelim (Yeni select kutumuzu da ekledik)
+// 1. Elementleri seçelim
 const girisKutusu = document.getElementById("dolarMiktari");
 const paraBirimiSecimi = document.getElementById("paraBirimi");
 const hesaplaButonu = document.getElementById("btnHesapla");
@@ -8,41 +8,63 @@ const sonucKutusu = document.getElementById("sonucAlani");
 hesaplaButonu.addEventListener("click", async function() {
     
     let girilenMiktar = girisKutusu.value; 
-    let secilenParaBirimi = paraBirimiSecimi.value; // "USD", "EUR" veya "GBP" değerini alır
+    let secilenIslem = paraBirimiSecimi.value; // Örn: "TRY_TO_USD" veya "USD_TO_TRY"
 
-    // Şart kontrolü: Boş değilse ve sıfırdan büyükse
     if (girilenMiktar !== "" && girilenMiktar > 0) {
         
         try {
             sonucKutusu.innerText = "Güncel kur verileri çekiliyor...";
             sonucKutusu.style.color = "#ffc107"; 
 
-            // API'den döviz verilerini çekiyoruz
+            // API'den döviz verilerini çekiyoruz (Base: USD)
             let response = await fetch("https://api.exchangerate-api.com/v4/latest/USD");
             let data = await response.json();
 
-            // Türk Lirası'nın Dolar karşısındaki değerini baz alarak hesaplama yapacağız
-            let usdToTry = data.rates.TRY; 
-            let guncelKur = 0;
+            let usdToTry = data.rates.TRY; // 1 Dolar kaç TL?
+            let usdToEur = data.rates.EUR; // 1 Dolar kaç Euro?
+            let usdToGbp = data.rates.GBP; // 1 Dolar kaç Sterlin?
 
-            // Seçilen birime göre kuru hesaplayalım
-            if (secilenParaBirimi === "USD") {
+            let guncelKur = 0;
+            let hesaplananSonuc = 0;
+            let hedefBirim = "";
+            let kaynakBirim = "";
+
+            // --- HESAPLAMA MANTIĞI ---
+            
+            if (secilenIslem === "USD_TO_TRY") {
                 guncelKur = usdToTry;
-            } else if (secilenParaBirimi === "EUR") {
-                // API verileri USD tabanlı olduğu için EUR/TL kurunu bu şekilde oranlayarak buluyoruz
-                let usdToEur = data.rates.EUR;
+                hesaplananSonuc = Number(girilenMiktar) * guncelKur;
+                kaynakBirim = "USD"; hedefBirim = "TL";
+            } 
+            else if (secilenIslem === "EUR_TO_TRY") {
                 guncelKur = usdToTry / usdToEur;
-            } else if (secilenParaBirimi === "GBP") {
-                // Aynı şekilde Sterlin/TL kurunu oranlıyoruz
-                let usdToGbp = data.rates.GBP;
+                hesaplananSonuc = Number(girilenMiktar) * guncelKur;
+                kaynakBirim = "EUR"; hedefBirim = "TL";
+            } 
+            else if (secilenIslem === "GBP_TO_TRY") {
                 guncelKur = usdToTry / usdToGbp;
+                hesaplananSonuc = Number(girilenMiktar) * guncelKur;
+                kaynakBirim = "GBP"; hedefBirim = "TL";
+            } 
+            // --- TL'DEN DÖVİZE ÇEVİRME (YENİ EKLENEN KISIM) ---
+            else if (secilenIslem === "TRY_TO_USD") {
+                guncelKur = usdToTry; 
+                hesaplananSonuc = Number(girilenMiktar) / guncelKur; // Çarpmak yerine böldük
+                kaynakBirim = "TL"; hedefBirim = "USD";
+            } 
+            else if (secilenIslem === "TRY_TO_EUR") {
+                guncelKur = usdToTry / usdToEur; // Euro/TL kuru
+                hesaplananSonuc = Number(girilenMiktar) / guncelKur; // TL'yi kura bölüyoruz
+                kaynakBirim = "TL"; hedefBirim = "EUR";
+            } 
+            else if (secilenIslem === "TRY_TO_GBP") {
+                guncelKur = usdToTry / usdToGbp; // Sterlin/TL kuru
+                hesaplananSonuc = Number(girilenMiktar) / guncelKur;
+                kaynakBirim = "TL"; hedefBirim = "GBP";
             }
 
-            // Matematiksel hesaplama
-            let tlKarsiligi = Number(girilenMiktar) * guncelKur;
-            
-            // Sonucu ekrana şık bir şekilde yazdıralım
-            sonucKutusu.innerText = `${girilenMiktar} ${secilenParaBirimi} = ${tlKarsiligi.toFixed(2)} TL ediyor. (Güncel Kur: ${guncelKur.toFixed(4)})`;
+            // Sonucu ekrana yazdırıyoruz
+            sonucKutusu.innerText = `${girilenMiktar} ${kaynakBirim} = ${hesaplananSonuc.toFixed(2)} ${hedefBirim} ediyor. (Kur: ${guncelKur.toFixed(4)})`;
             sonucKutusu.style.color = "#28a745"; 
             
             // Kutuyu temizle
