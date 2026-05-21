@@ -12,11 +12,15 @@
     <!-- Çevrilecek Miktar -->
     <input id="dolarMiktari" type="number" placeholder="Miktarı girin...">
     
-    <!-- Para Birimi Seçimi -->
+    <!-- Para Birimi Seçimi (YENİ SEÇENEKLER EKLENDİ) -->
     <select id="paraBirimi">
-        <option value="USD">Dolar (USD) -> TL</option>
-        <option value="EUR">Euro (EUR) -> TL</option>
-        <option value="GBP">Sterlin (GBP) -> TL</option>
+        <option value="USD_TO_TRY">Dolar (USD) -> TL</option>
+        <option value="EUR_TO_TRY">Euro (EUR) -> TL</option>
+        <option value="GBP_TO_TRY">Sterlin (GBP) -> TL</option>
+        <hr> <!-- Görsel ayrım için -->
+        <option value="TRY_TO_USD">TL -> Dolar (USD)</option>
+        <option value="TRY_TO_EUR">TL -> Euro (EUR)</option>
+        <option value="TRY_TO_GBP">TL -> Sterlin (GBP)</option>
     </select>
     
     <button id="btnHesapla">Hesapla</button>
@@ -24,6 +28,7 @@
     <!-- Sonucu göstereceğimiz alan -->
     <div id="sonucAlani"></div>
 </div>
+
     <script src="odev.js"></script>  
 </body> 
 </html>
