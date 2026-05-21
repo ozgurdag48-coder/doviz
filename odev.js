@@ -17,7 +17,8 @@ hesaplaButonu.addEventListener("click", async function() {
             sonucKutusu.style.color = "#ffc107"; 
 
             // HTTPS olmasına ve doğrudan fonksiyonun İÇİNDE çağrılmasına dikkat ediyoruz
-            let response = await fetch("https://api.exchangerate-api.com/v4/latest/USD");
+            let response = await fetch("https://open.er-api.com/v6/latest/USD");
+
             let data = await response.json();
 
             let usdToTry = data.rates.TRY; // 1 Dolar kaç TL?
